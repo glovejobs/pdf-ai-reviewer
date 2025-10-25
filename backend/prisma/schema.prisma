@@ -1,0 +1,200 @@
+// Prisma schema for AI Content Review System
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Document {
+  id            String         @id @default(cuid())
+  filename      String
+  originalName  String
+  fileSize      Int
+  mimeType      String
+  s3Key         String?
+  s3Url         String?
+  pageCount     Int?
+  uploadedAt    DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  status        DocumentStatus @default(UPLOADED)
+
+  // Relations
+  chunks        Chunk[]
+  result        DocumentResult?
+  jobs          Job[]
+  auditLogs     AuditLog[]
+
+  @@map("documents")
+}
+
+model Job {
+  id          String    @id @default(cuid())
+  documentId  String
+  jobType     JobType
+  status      JobStatus @default(PENDING)
+  progress    Int       @default(0)
+  startedAt   DateTime?
+  completedAt DateTime?
+  error       String?
+  metadata    Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  document    Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+  @@index([status])
+  @@map("jobs")
+}
+
+model Chunk {
+  id         String        @id @default(cuid())
+  documentId String
+  chunkIndex Int
+  text       String        @db.Text
+  pageStart  Int?
+  pageEnd    Int?
+  tokenCount Int?
+  createdAt  DateTime      @default(now())
+
+  document   Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  results    ChunkResult[]
+
+  @@unique([documentId, chunkIndex])
+  @@index([documentId])
+  @@map("chunks")
+}
+
+model ChunkResult {
+  id                 String   @id @default(cuid())
+  chunkId            String
+  violenceScore      Float?
+  sexualContentScore Float?
+  profanityScore     Float?
+  hateScore          Float?
+  selfHarmScore      Float?
+  rawClassification  Json?    // OpenAI moderation result
+  rubricMapping      Json?    // Claude rubric mapping
+  flaggedTerms       Json?    // Term counts
+  confidence         Float?
+  rationale          String?  @db.Text
+  evidence           Json?    // Flagged excerpts with page numbers
+  createdAt          DateTime @default(now())
+
+  chunk              Chunk    @relation(fields: [chunkId], references: [id], onDelete: Cascade)
+
+  @@index([chunkId])
+  @@map("chunk_results")
+}
+
+model DocumentResult {
+  id                    String   @id @default(cuid())
+  documentId            String   @unique
+  overallRating         Int      // 0-5 rating
+  violenceScore         Float
+  sexualContentScore    Float
+  profanityScore        Float
+  hateScore             Float?
+  selfHarmScore         Float?
+  confidence            Float
+  totalFlaggedTerms     Int
+  flaggedTermsByCategory Json?   // Categorized term counts
+  summary               String   @db.Text
+  rationale             String   @db.Text
+  evidenceExcerpts      Json?    // Key flagged passages
+  metadata              Json?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  document              Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([overallRating])
+  @@map("doc_results")
+}
+
+model TermList {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  category    TermCategory
+  terms       Json         // Array of terms/regex patterns
+  description String?
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("term_lists")
+}
+
+model Template {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  format      String   // PDF, DOCX, CSV
+  template    Json     // Template structure
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("templates")
+}
+
+model AuditLog {
+  id          String       @id @default(cuid())
+  documentId  String?
+  action      AuditAction
+  userId      String?
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime     @default(now())
+
+  document    Document?    @relation(fields: [documentId], references: [id], onDelete: SetNull)
+
+  @@index([documentId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// Enums
+enum DocumentStatus {
+  UPLOADED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum JobType {
+  TEXT_EXTRACTION
+  CLASSIFICATION
+  RUBRIC_MAPPING
+  AGGREGATION
+  REPORT_GENERATION
+}
+
+enum JobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum TermCategory {
+  PROFANITY
+  VIOLENCE
+  SEXUAL
+  HATE
+  DRUGS
+  OTHER
+}
+
+enum AuditAction {
+  UPLOAD
+  VIEW
+  EXPORT
+  DELETE
+  UPDATE_SETTINGS
+}

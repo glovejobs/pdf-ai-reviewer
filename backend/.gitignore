@@ -1,0 +1,39 @@
+# CRITICAL: Environment variables with API keys
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+
+# Build
+dist/
+build/
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Prisma
+migrations/
+!migrations/.gitkeep
+prisma/dev.db
+prisma/dev.db-journal
+
+# Uploads (PDFs)
+uploads/
+temp/
+storage/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store

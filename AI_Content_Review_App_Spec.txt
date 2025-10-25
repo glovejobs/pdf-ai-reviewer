@@ -1,0 +1,341 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2822
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww38200\viewh19980\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 # \uc0\u55358 \u56800  AI Content Review & Rating System  \
+### UX Design Ticket + PRD (Full Specification)\
+\
+---\
+\
+## 1\uc0\u65039 \u8419  UX DESIGN TICKET (From Linear)\
+\
+**Project:** AI Content Review Environment  \
+**Type:** UX Design  \
+**Priority:** High  \
+**Status:** In Progress  \
+**Target Release:** v1.0 MVP  \
+\
+---\
+\
+### \uc0\u55356 \u57263  Objective\
+Design a user experience for an AI-driven content review system that allows users to upload, review, and rate books or documents based on explicitness, violence, or offensive language \'97 aligned with the \'93Comprehensive Content Based Rating Scale.\'94\
+\
+---\
+\
+### \uc0\u55358 \u56809  Problem Statement\
+Manual review and rating of large documents (books, reports) are inconsistent and time-consuming. We need an AI-assisted platform where users can drop in PDFs or excerpts and receive automated content ratings, explicitness reports, and flagged word lists, all formatted like existing reports.\
+\
+---\
+\
+### \uc0\u55358 \u56800  Key Goals\
+1. Drag-and-drop upload of PDFs or text excerpts.  \
+2. AI review that **does not halt** on explicit content.  \
+3. Ratings aligned with the **0\'965 \'93Comprehensive Content Based Rating Scale.\'94**  \
+4. Reports include flagged word counts and excerpts.  \
+5. (Nice to have) Exported report matches the client\'92s existing layout.\
+\
+---\
+\
+### \uc0\u55357 \u56741 \u65039  Core UX Flows\
+\
+**1. Upload Flow**  \
+- Drag-and-drop zone for PDFs or text excerpts  \
+- File preview (title, size, pages)  \
+- Add context or reference an existing report\
+\
+**2. AI Review Flow**  \
+- Progress visualization (loading, analyzing, summarizing)  \
+- Live feedback: detected themes (violence, profanity, etc.)  \
+- Toggle between raw flagged excerpts and summarized report\
+\
+**3. Rating Output View**  \
+- Final 0\'965 Content Rating (color-coded badge)  \
+- Category rationales referencing the official rating scale  \
+- Offensive-term frequency chart\
+\
+**4. Report Generation Flow**  \
+- Export to PDF, DOCX, or CSV  \
+- Option: \'93Match Existing Report Format\'94 toggle  \
+- Edit/Annotate mode before export\
+\
+---\
+\
+### \uc0\u55356 \u57256  UI Components to Design\
+- Upload Modal / Drop Zone  \
+- AI Processing Loader  \
+- Rating Scale Visualization (color + numeric code)  \
+- Flagged Content Table  \
+- Report Summary Page  \
+- Export Options Dropdown  \
+- Settings Panel for Rating Criteria  \
+\
+---\
+\
+### \uc0\u9989  Acceptance Criteria\
+- Upload & process full PDFs successfully.  \
+- AI runs without refusing explicit content.  \
+- Output includes rating + flagged word summary.  \
+- Uses the official 0\'965 scale definitions.  \
+- Reports can export in the client\'92s format.  \
+\
+---\
+\
+### \uc0\u55357 \u56622  Future Enhancements\
+- AI fine-tuning with historical rated data.  \
+- Admin dashboard to adjust thresholds.  \
+- Comparison view (AI vs. human reviews).  \
+- Third-party moderation API integration.\
+\
+---\
+\
+---\
+\
+## 2\uc0\u65039 \u8419  PRODUCT REQUIREMENTS DOCUMENT (PRD)\
+\
+### Summary\
+Build a web app that ingests PDFs or pasted excerpts, analyzes content for explicit/violent/offensive material, assigns a **0\'965 rating** using the client\'92s \'93Comprehensive Content Based Rating Scale,\'94 and exports a formatted report. Must handle explicit text without refusal.\
+\
+---\
+\
+### Primary Goals\
+- Ingest full books (500+ pages).  \
+- Review explicit passages safely.  \
+- Apply the 0\'965 rubric consistently.  \
+- Generate structured reports (ratings, excerpts, term counts).  \
+- (Optional) Export matching the client\'92s report layout.\
+\
+---\
+\
+### Users & Top Tasks\
+**Raters/Analysts:** Upload, review, export reports.  \
+**QA Leads:** Compare ratings, approve final reports.  \
+**Admins:** Manage term lists, templates, thresholds.\
+\
+Tasks:\
+1. Upload PDF \uc0\u8594  Analyze \u8594  View Results \u8594  Export  \
+2. Paste excerpt \uc0\u8594  Quick review  \
+3. Adjust thresholds or term lists \uc0\u8594  Re-run\
+\
+---\
+\
+### Success Metrics\
+- \uc0\u8805 90% agreement with prior hand-ratings  \
+- \uc0\u8805 99% completion rate  \
+- <6 min analysis for 400 pages  \
+- SUS \uc0\u8805 80 usability score\
+\
+---\
+\
+### Architecture Overview\
+- **Frontend:** Next.js (TypeScript)  \
+- **Backend:** Node.js (Fastify or Nest) or Python (FastAPI)  \
+- **Queue:** BullMQ / Redis  \
+- **Storage:** S3 for uploads, Postgres for data  \
+- **Pipeline Steps:**\
+  1. Text extraction (pdfminer/pdfplumber + Tesseract OCR)  \
+  2. Chunking (8\'9610k tokens, 1k overlap)  \
+  3. Classification  \
+  4. Rubric mapping (Claude 3.5 Sonnet)  \
+  5. Term counting  \
+  6. Aggregation + report generation  \
+\
+---\
+\
+### LLM Models\
+**Primary classifier:**  \
+- `omni-moderation-latest` (OpenAI) \uc0\u8594  explicit, violence, hate detection  \
+  - or `Llama Guard 3 (text)` self-hosted for no refusals  \
+\
+**Rubric mapping + summarization:**  \
+- `claude-3.5-sonnet-latest` \uc0\u8594  maps classifier data to 0\'965 rating + generates rationales  \
+\
+> Reason: dedicated moderation model handles explicit content safely; Claude produces structured reasoning and readable reports.\
+\
+---\
+\
+### Data Model (Postgres)\
+`documents` \'96 metadata  \
+`jobs` \'96 queue tracking  \
+`chunks` \'96 text slices  \
+`chunk_results` \'96 raw model outputs  \
+`doc_results` \'96 aggregate scores  \
+`term_lists` \'96 regex dictionary  \
+`templates` \'96 export formats  \
+`audit_logs` \'96 user actions\
+\
+---\
+\
+### Key UX Flows\
+1. **Upload:** Drag-drop \uc0\u8594  metadata \u8594  start analysis  \
+2. **Analysis:** Real-time progress, show themes detected  \
+3. **Results:** Rating scale, term counts, excerpts  \
+4. **Export:** Preview + download matching template  \
+5. **Admin:** Edit term lists, thresholds, templates\
+\
+---\
+\
+### Endpoints\
+POST /api/documents\
+POST /api/documents/:id/ingest\
+GET /api/documents/:id/status\
+GET /api/documents/:id/result\
+POST /api/term-lists\
+GET /api/templates\
+POST /api/reports/:id/export\
+\
+yaml\
+Copy code\
+\
+---\
+\
+### LLM Integration Details\
+\
+**Classifier Call (OpenAI Moderation)**\
+```json\
+\{\
+  "model": "omni-moderation-latest",\
+  "input": "text chunk (<=10k tokens)"\
+\}\
+Returns JSON with fields like sexual_explicit, violence_graphic, hate, self-harm, etc.\
+\
+Claude Rubric Mapping\
+\
+json\
+Copy code\
+\{\
+  "chunk_id": "c_123",\
+  "scores": \{\
+    "violence": 0-5,\
+    "sexual_content": 0-5,\
+    "profanity": 0-5\
+  \},\
+  "rationale": "Short factual summary",\
+  "evidence": [\{"page": 47, "quote": "..."\}]\
+\}\
+Aggregator Prompt (Claude)\
+Input: all chunk results\
+Output: overall rating, per-category scores, confidence, markdown summary\
+\
+Term Counting\
+Regex-based (case-insensitive)\
+\
+Category mapping (profanity, violence, hate)\
+\
+Returns per-page and total counts as JSON\
+\
+Aggregation Logic\
+Weighted mean + percentile blending\
+\
+\'93Hard cap\'94 (sexual minors \uc0\u8594  auto rating 5)\
+\
+Confidence = agreement \'d7 model certainty\
+\
+Evaluation Plan\
+200 gold-set docs with known ratings\
+\
+Metrics: Quadratic Weighted Kappa (QWK) \uc0\u8805 0.8\
+\
+Regression re-runs on every model update\
+\
+Privacy & Compliance\
+Encrypted uploads (S3 SSE)\
+\
+TLS for all transit\
+\
+Optional PII scrubbing\
+\
+Audit logs for all views/exports\
+\
+Risks\
+Model refusal \uc0\u8594  mitigated via dedicated classifier\
+\
+OCR noise \uc0\u8594  flag low-confidence pages\
+\
+Long runtime \uc0\u8594  chunk resume + queue retries\
+\
+Milestones\
+Week 1: Ingestion + classifier\
+Week 2: Rubric mapping + aggregation\
+Week 3: Frontend upload UI + results\
+Week 4: Export formatting + admin\
+Week 5: QA, gold-set eval, polish\
+\
+Acceptance Criteria (MVP)\
+\uc0\u9989  Process a 300-page PDF fully\
+\uc0\u9989  Outputs overall 0\'965 rating, category scores, term counts, and evidence\
+\uc0\u9989  AI never refuses explicit analysis\
+\uc0\u9989  Exported report matches existing format\
+\uc0\u9989  Admin can manage terms & thresholds\
+\uc0\u9989  QWK \u8805  0.8 vs. human ratings\
+\
+Example Code Snippet\
+ts\
+Copy code\
+// 1) OpenAI Moderation\
+const mod = await openai.moderations.create(\{\
+  model: "omni-moderation-latest",\
+  input: chunkText\
+\});\
+\
+// 2) Claude Rubric Mapping\
+const system = `You classify and summarize explicit text for safety reporting...`;\
+const user = \{ classification_json: mod.results[0], rating_scale: RATING_SCALE \};\
+const claude = await anthropic.messages.create(\{\
+  model: "claude-3-5-sonnet-latest",\
+  system,\
+  max_tokens: 1500,\
+  temperature: 0,\
+  messages: [\{ role: "user", content: JSON.stringify(user) \}]\
+\});\
+const result = JSON.parse(extractJson(claude));\
+Embedded Rating Scale (Config Constant)\
+yaml\
+Copy code\
+0 \'96 All Ages: No profanity, no nudity, no violence\
+1 \'96 Juvenile Advisory: Mild references, no explicit acts\
+2 \'96 Youth Advisory: Moderate violence, explicit ideologies\
+3 \'96 Youth Restricted: Explicit references, moderate nudity\
+4 \'96 Adults Only: Graphic acts, strong profanity, gore\
+5 \'96 Deviant Content: Aberrant, sexual assault, extreme violence\
+Implementation Notes for Claude Code\
+Tools: ingest_tool, classify_tool, map_rubric_tool, aggregate_tool, report_tool\
+\
+Prompts in versioned JSON\
+\
+\'93Dry run\'94 mode for short docs\
+\
+Frontend built with Next.js + Tailwind\
+\
+Backend with Node.js + Fastify\
+\
+Postgres schema via Prisma ORM\
+\
+File/Folder Structure (suggested)\
+bash\
+Copy code\
+/content-review-app\
+  /frontend\
+    /components\
+    /pages\
+  /backend\
+    /api\
+    /models\
+    /services\
+  /prompts\
+  /data\
+  /tests\
+  .env.example\
+  README.md\
+Deployment\
+Frontend: Vercel\
+\
+Backend: Railway or Render\
+\
+Database: Supabase / Neon Postgres\
+\
+Storage: AWS S3\
+\
+Monitoring: Logtail + Sentry}

@@ -1,0 +1,38 @@
+{
+  "name": "ai-content-review-backend",
+  "version": "1.0.0",
+  "description": "Backend API for AI Content Review & Rating System",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio"
+  },
+  "keywords": ["fastify", "ai", "content-review", "typescript"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.31.0",
+    "@fastify/cors": "^10.0.1",
+    "@fastify/multipart": "^9.0.1",
+    "@prisma/client": "^6.1.0",
+    "dotenv": "^16.4.7",
+    "fastify": "^5.2.0",
+    "openai": "^4.77.3",
+    "pdf-parse": "^1.1.1",
+    "bullmq": "^5.28.2",
+    "ioredis": "^5.4.2",
+    "aws-sdk": "^2.1691.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "@types/pdf-parse": "^1.1.4",
+    "prisma": "^6.1.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}
