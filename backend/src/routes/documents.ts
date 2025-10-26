@@ -68,7 +68,7 @@ export default async function documentRoutes(fastify: FastifyInstance) {
       });
 
     } catch (error) {
-      fastify.log.error('Upload error:', error);
+      fastify.log.error(error as Error, 'Upload error');
       return reply.code(500).send({
         error: 'Failed to upload document',
         message: error instanceof Error ? error.message : 'Unknown error'
@@ -105,7 +105,7 @@ export default async function documentRoutes(fastify: FastifyInstance) {
       throw new Error('Ingestion endpoint requires file retrieval from storage');
 
     } catch (error) {
-      fastify.log.error('Ingest error:', error);
+      fastify.log.error(error as Error, 'Ingest error');
       return reply.code(500).send({
         error: 'Failed to start ingestion',
         message: error instanceof Error ? error.message : 'Unknown error'
@@ -161,7 +161,7 @@ export default async function documentRoutes(fastify: FastifyInstance) {
       });
 
     } catch (error) {
-      fastify.log.error('Status error:', error);
+      fastify.log.error(error as Error, 'Status error');
       return reply.code(500).send({
         error: 'Failed to get status',
         message: error instanceof Error ? error.message : 'Unknown error'
@@ -232,7 +232,7 @@ export default async function documentRoutes(fastify: FastifyInstance) {
       });
 
     } catch (error) {
-      fastify.log.error('Result error:', error);
+      fastify.log.error(error as Error, 'Result error');
       return reply.code(500).send({
         error: 'Failed to get result',
         message: error instanceof Error ? error.message : 'Unknown error'
@@ -273,7 +273,7 @@ export default async function documentRoutes(fastify: FastifyInstance) {
       });
 
     } catch (error) {
-      fastify.log.error('List error:', error);
+      fastify.log.error(error as Error, 'List error');
       return reply.code(500).send({
         error: 'Failed to list documents',
         message: error instanceof Error ? error.message : 'Unknown error'

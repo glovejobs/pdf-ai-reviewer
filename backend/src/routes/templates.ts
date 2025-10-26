@@ -14,7 +14,7 @@ export default async function templateRoutes(fastify: FastifyInstance) {
       return reply.send({ templates });
 
     } catch (error) {
-      fastify.log.error('Get templates error:', error);
+      fastify.log.error(error as Error, 'Get templates error:');
       return reply.code(500).send({
         error: 'Failed to get templates',
         message: error instanceof Error ? error.message : 'Unknown error'
@@ -65,7 +65,7 @@ export default async function templateRoutes(fastify: FastifyInstance) {
       return reply.code(201).send({ template: newTemplate });
 
     } catch (error) {
-      fastify.log.error('Create template error:', error);
+      fastify.log.error(error as Error, 'Create template error:');
       return reply.code(500).send({
         error: 'Failed to create template',
         message: error instanceof Error ? error.message : 'Unknown error'
@@ -94,7 +94,7 @@ export default async function templateRoutes(fastify: FastifyInstance) {
       return reply.send({ template });
 
     } catch (error) {
-      fastify.log.error('Get template error:', error);
+      fastify.log.error(error as Error, 'Get template error:');
       return reply.code(500).send({
         error: 'Failed to get template',
         message: error instanceof Error ? error.message : 'Unknown error'
@@ -146,7 +146,7 @@ export default async function templateRoutes(fastify: FastifyInstance) {
       return reply.send({ template: updated });
 
     } catch (error) {
-      fastify.log.error('Update template error:', error);
+      fastify.log.error(error as Error, 'Update template error:');
       return reply.code(500).send({
         error: 'Failed to update template',
         message: error instanceof Error ? error.message : 'Unknown error'
@@ -171,7 +171,7 @@ export default async function templateRoutes(fastify: FastifyInstance) {
       return reply.send({ message: 'Template deleted successfully' });
 
     } catch (error) {
-      fastify.log.error('Delete template error:', error);
+      fastify.log.error(error as Error, 'Delete template error:');
       return reply.code(500).send({
         error: 'Failed to delete template',
         message: error instanceof Error ? error.message : 'Unknown error'

@@ -14,7 +14,7 @@ export default async function termListRoutes(fastify: FastifyInstance) {
       return reply.send({ termLists });
 
     } catch (error) {
-      fastify.log.error('Get term lists error:', error);
+      fastify.log.error(error as Error, 'Get term lists error:');
       return reply.code(500).send({
         error: 'Failed to get term lists',
         message: error instanceof Error ? error.message : 'Unknown error'
@@ -57,7 +57,7 @@ export default async function termListRoutes(fastify: FastifyInstance) {
       return reply.code(201).send({ termList });
 
     } catch (error) {
-      fastify.log.error('Create term list error:', error);
+      fastify.log.error(error as Error, 'Create term list error:');
       return reply.code(500).send({
         error: 'Failed to create term list',
         message: error instanceof Error ? error.message : 'Unknown error'
@@ -95,7 +95,7 @@ export default async function termListRoutes(fastify: FastifyInstance) {
       return reply.send({ termList });
 
     } catch (error) {
-      fastify.log.error('Update term list error:', error);
+      fastify.log.error(error as Error, 'Update term list error:');
       return reply.code(500).send({
         error: 'Failed to update term list',
         message: error instanceof Error ? error.message : 'Unknown error'
@@ -120,7 +120,7 @@ export default async function termListRoutes(fastify: FastifyInstance) {
       return reply.send({ message: 'Term list deleted successfully' });
 
     } catch (error) {
-      fastify.log.error('Delete term list error:', error);
+      fastify.log.error(error as Error, 'Delete term list error:');
       return reply.code(500).send({
         error: 'Failed to delete term list',
         message: error instanceof Error ? error.message : 'Unknown error'

@@ -65,7 +65,7 @@ export default async function reportRoutes(fastify: FastifyInstance) {
       return reply.send(reportData);
 
     } catch (error) {
-      fastify.log.error('Export error:', error);
+      fastify.log.error(error as Error, 'Export error:');
       return reply.code(500).send({
         error: 'Failed to export report',
         message: error instanceof Error ? error.message : 'Unknown error'
@@ -101,7 +101,7 @@ export default async function reportRoutes(fastify: FastifyInstance) {
       });
 
     } catch (error) {
-      fastify.log.error('Preview error:', error);
+      fastify.log.error(error as Error, 'Preview error:');
       return reply.code(500).send({
         error: 'Failed to generate preview',
         message: error instanceof Error ? error.message : 'Unknown error'

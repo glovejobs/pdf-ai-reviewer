@@ -109,14 +109,7 @@ export async function mapToRubric(
         model: MODELS.CLAUDE_RUBRIC,
         max_tokens: 1500,
         temperature: 0,
-        // Enable prompt caching to save 90% on repeated system prompts
-        system: [
-          {
-            type: 'text',
-            text: SYSTEM_PROMPT,
-            cache_control: { type: 'ephemeral' }
-          }
-        ],
+        system: SYSTEM_PROMPT,
         messages: [
           {
             role: 'user',
@@ -217,14 +210,7 @@ Return JSON:
       model: MODELS.CLAUDE_RUBRIC,
       max_tokens: 2000,
       temperature: 0,
-      // Enable prompt caching for aggregation system prompt
-      system: [
-        {
-          type: 'text',
-          text: systemPrompt,
-          cache_control: { type: 'ephemeral' }
-        }
-      ],
+      system: systemPrompt,
       messages: [
         {
           role: 'user',
