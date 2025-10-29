@@ -5,6 +5,7 @@ import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
 
 // Import routes
+import authRoutes from './routes/auth';
 import documentRoutes from './routes/documents';
 import reportRoutes from './routes/reports';
 import termListRoutes from './routes/term-lists';
@@ -33,6 +34,7 @@ fastify.register(multipart, {
 fastify.decorate('prisma', prisma);
 
 // Register routes
+fastify.register(authRoutes, { prefix: '/api/auth' });
 fastify.register(documentRoutes, { prefix: '/api/documents' });
 fastify.register(reportRoutes, { prefix: '/api/reports' });
 fastify.register(termListRoutes, { prefix: '/api/term-lists' });

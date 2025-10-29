@@ -21,12 +21,17 @@ model Document {
   updatedAt     DateTime       @updatedAt
   status        DocumentStatus @default(UPLOADED)
 
+  // User relation
+  userId        String?        // Optional - for uploaded documents
+  user          User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+
   // Relations
   chunks        Chunk[]
   result        DocumentResult?
   jobs          Job[]
   auditLogs     AuditLog[]
 
+  @@index([userId])
   @@map("documents")
 }
 
@@ -152,10 +157,65 @@ model AuditLog {
   createdAt   DateTime     @default(now())
 
   document    Document?    @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  user        User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([documentId])
+  @@index([userId])
   @@index([createdAt])
   @@map("audit_logs")
+}
+
+model User {
+  id              String       @id @default(cuid())
+  email           String       @unique
+  name            String?
+  password        String?      // Hashed password (null for OAuth users)
+  role            UserRole     @default(USER)
+
+  // OAuth fields
+  googleId        String?      @unique
+  avatarUrl       String?
+
+  // Status
+  isActive        Boolean      @default(true)
+  emailVerified   Boolean      @default(false)
+  lastLoginAt     DateTime?
+
+  // Timestamps
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  // Relations
+  documents       Document[]
+  auditLogs       AuditLog[]
+  ratingGuidelines RatingGuideline[]
+
+  @@index([email])
+  @@index([role])
+  @@map("users")
+}
+
+model RatingGuideline {
+  id            String   @id @default(cuid())
+  category      String   // violence, sexual, profanity, hate, selfHarm
+  ratingLevel   Int      // 0-5
+  title         String
+  description   String   @db.Text
+  criteria      Json     // Array of criteria/rules
+  examples      Json?    // Example content
+  isActive      Boolean  @default(true)
+
+  // Metadata
+  createdBy     String
+  updatedBy     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  creator       User     @relation(fields: [createdBy], references: [id])
+
+  @@index([category])
+  @@index([ratingLevel])
+  @@map("rating_guidelines")
 }
 
 // Enums
@@ -197,4 +257,14 @@ enum AuditAction {
   EXPORT
   DELETE
   UPDATE_SETTINGS
+  LOGIN
+  LOGOUT
+  CREATE_GUIDELINE
+  UPDATE_GUIDELINE
+  DELETE_GUIDELINE
+}
+
+enum UserRole {
+  ADMIN
+  USER
 }

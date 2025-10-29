@@ -9,6 +9,15 @@ export const api = axios.create({
   },
 });
 
+// Add auth token to requests
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('auth_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 // Document API
 export const documentApi = {
   upload: async (file: File) => {
@@ -98,6 +107,34 @@ export const templateApi = {
 
   delete: async (id: string) => {
     const response = await api.delete(`/templates/${id}`);
+    return response.data;
+  },
+};
+
+// Auth API
+export const authApi = {
+  register: async (data: { email: string; password: string; name?: string }) => {
+    const response = await api.post('/auth/register', data);
+    return response.data;
+  },
+
+  login: async (data: { email: string; password: string }) => {
+    const response = await api.post('/auth/login', data);
+    return response.data;
+  },
+
+  googleAuth: async (idToken: string) => {
+    const response = await api.post('/auth/google', { idToken });
+    return response.data;
+  },
+
+  getCurrentUser: async () => {
+    const response = await api.get('/auth/me');
+    return response.data;
+  },
+
+  logout: async () => {
+    const response = await api.post('/auth/logout');
     return response.data;
   },
 };
